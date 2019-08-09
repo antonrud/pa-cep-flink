@@ -9,7 +9,6 @@
 /target
 dependency-reduced-pom.xml
 *.releaseBackup
-*.properties
 
 # Log file
 log.txt

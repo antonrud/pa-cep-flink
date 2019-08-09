@@ -22,7 +22,7 @@ import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 
-public class StreamingJob {
+public class IncomingProducerJob {
 
     public static void main(String[] args) throws Exception {
 
