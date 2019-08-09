@@ -26,6 +26,7 @@ public class KeyedDataPoint<T> extends DataPoint<T> {
         this.key = key;
     }
 
+    @Override
     public String toString() {
         return ReflectionToStringBuilder.toString(this);
     }
