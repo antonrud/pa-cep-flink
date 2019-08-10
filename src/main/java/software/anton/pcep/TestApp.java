@@ -2,6 +2,8 @@ package software.anton.pcep;
 
 import software.anton.pcep.utils.GrafanaAnnotator;
 
+import static software.anton.pcep.configs.Configuration.*;
+
 /**
  * @author Anton Rudacov <anton.rudacov @ gmail.com>
  */
@@ -11,6 +13,6 @@ public class TestApp {
 
         long start = System.currentTimeMillis();
 
-        System.out.println(new GrafanaAnnotator(7, 2).sendAnnotation(start, start + 1000L));
+        System.out.println(new GrafanaAnnotator(GRAFANA_DASHBOARD, GRAFANA_PANEL).sendAnnotation(start, start + 1000L));
     }
 }

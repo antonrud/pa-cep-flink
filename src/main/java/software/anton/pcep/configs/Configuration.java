@@ -15,4 +15,7 @@ public final class Configuration {
     public static final String INFLUX_PASS = "root";
     public static final String INFLUX_DATABASE = "calit";
     public static final String INFLUX_MEASUREMENT = "data";
+
+    public static final int GRAFANA_DASHBOARD = 5;
+    public static final int GRAFANA_PANEL = 2;
 }
