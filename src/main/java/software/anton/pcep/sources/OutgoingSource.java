@@ -19,12 +19,12 @@ import static java.util.stream.Collectors.toCollection;
  */
 public class OutgoingSource extends RichSourceFunction<String> {
 
-    private long period;
+    private long rate;
     private boolean isRunning;
     private LinkedList<String> lines;
 
-    public OutgoingSource(long period) {
-        this.period = period;
+    public OutgoingSource(long rate) {
+        this.rate = rate;
         this.isRunning = true;
     }
 
@@ -41,7 +41,7 @@ public class OutgoingSource extends RichSourceFunction<String> {
     public void run(SourceFunction.SourceContext<String> ctx) throws Exception {
 
         while (isRunning) {
-            Thread.sleep(period);
+            Thread.sleep(rate);
 
             String[] parts = Objects.requireNonNull(lines.pollFirst()).split(",");
             long timeStamp = System.currentTimeMillis();

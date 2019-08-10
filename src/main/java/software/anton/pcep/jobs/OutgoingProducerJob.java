@@ -20,7 +20,7 @@ public class OutgoingProducerJob {
         env.setParallelism(1);
         env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
-        DataStream<String> outgoingStream = env.addSource(new OutgoingSource(100L));
+        DataStream<String> outgoingStream = env.addSource(new OutgoingSource(RATE));
 
         outgoingStream.addSink(new FlinkKafkaProducer<>(KAFKA_BROKER, KAFKA_TOPIC, new SimpleStringSchema()));
         outgoingStream.print();

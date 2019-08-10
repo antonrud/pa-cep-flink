@@ -6,6 +6,7 @@ package software.anton.pcep.configs;
 public final class Configuration {
 
     public static final String DATASET = "src/main/resources/dataset/CalIt2.data";
+    public static final long RATE = 100L;
 
     public static final String KAFKA_BROKER = "localhost:9092";
     public static final String KAFKA_TOPIC = "calit";
