@@ -44,7 +44,7 @@ public class IncomingSource extends RichSourceFunction<String> {
 
             String[] parts = Objects.requireNonNull(lines.pollFirst()).split(",");
             long timeStamp = System.currentTimeMillis();
-            String line = "in," + timeStamp + "," + parts[parts.length - 1];
+            String line = "in," + parts[parts.length - 1] + "," + timeStamp;
 
             ctx.collectWithTimestamp(line, timeStamp);
             ctx.emitWatermark(new Watermark(timeStamp));
