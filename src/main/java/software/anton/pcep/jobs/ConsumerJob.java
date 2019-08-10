@@ -1,5 +1,7 @@
 package software.anton.pcep.jobs;
 
+import static software.anton.pcep.configs.Configuration.*;
+
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -16,10 +18,6 @@ import java.util.Properties;
  */
 public class ConsumerJob {
 
-    private static final String TOPIC = "calit";
-    private static final String INFLUX_DB = "calit";
-    private static final String INFLUX_MEASUREMENT = "data";
-
     public static void main(String[] args) throws Exception {
 
         Properties properties = createKafkaProperties();
@@ -29,11 +27,11 @@ public class ConsumerJob {
         env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
         DataStream<KeyedDataPoint<Integer>> dataStream = env
-                .addSource(new FlinkKafkaConsumer<>(TOPIC, new SimpleStringSchema(), properties))
+                .addSource(new FlinkKafkaConsumer<>(KAFKA_TOPIC, new SimpleStringSchema(), properties))
                 .flatMap(new KeyedDataPointMap());
 
         // Persist data in InfluxDB
-        dataStream.addSink(new InfluxDBSink<>(INFLUX_DB, INFLUX_MEASUREMENT));
+        dataStream.addSink(new InfluxDBSink<>(INFLUX_DATABASE, INFLUX_MEASUREMENT));
 
         env.execute("Data consumer");
     }
@@ -43,7 +41,6 @@ public class ConsumerJob {
         Properties kafkaProperties = new Properties();
         kafkaProperties.setProperty("zookeeper.connect", "localhost:2181");
         kafkaProperties.setProperty("bootstrap.servers", "localhost:9092");
-//        kafkaProperties.setProperty("group.id", "calit");
 
         return kafkaProperties;
     }

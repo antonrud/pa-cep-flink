@@ -1,5 +1,7 @@
 package software.anton.pcep.jobs;
 
+import static software.anton.pcep.configs.Configuration.*;
+
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -12,9 +14,6 @@ import software.anton.pcep.sources.OutgoingSource;
  */
 public class OutgoingProducerJob {
 
-    private static final String BROKER = "localhost:9092";
-    private static final String TOPIC = "calit";
-
     public static void main(String[] args) throws Exception {
 
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -23,7 +22,7 @@ public class OutgoingProducerJob {
 
         DataStream<String> outgoingStream = env.addSource(new OutgoingSource(100L));
 
-        outgoingStream.addSink(new FlinkKafkaProducer<>(BROKER, TOPIC, new SimpleStringSchema()));
+        outgoingStream.addSink(new FlinkKafkaProducer<>(KAFKA_BROKER, KAFKA_TOPIC, new SimpleStringSchema()));
         outgoingStream.print();
 
         env.execute("Outgoing Producer");

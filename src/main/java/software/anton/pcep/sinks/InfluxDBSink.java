@@ -1,5 +1,7 @@
 package software.anton.pcep.sinks;
 
+import static software.anton.pcep.configs.Configuration.*;
+
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
 import org.influxdb.InfluxDB;
@@ -7,17 +9,12 @@ import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Point;
 import software.anton.pcep.data.KeyedDataPoint;
 
-
 import java.util.concurrent.TimeUnit;
 
 /**
  * @author Anton Rudacov <anton.rudacov @ gmail.com>
  */
 public class InfluxDBSink<T> extends RichSinkFunction<KeyedDataPoint<T>> {
-
-    private static final String INFLUX_URL = "http://localhost:8086";
-    private static final String INFLUX_USER = "root";
-    private static final String INFLUX_PASS = "root";
 
     private InfluxDB influxDB;
     private String database;

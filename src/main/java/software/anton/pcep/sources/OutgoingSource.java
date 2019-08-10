@@ -1,5 +1,7 @@
 package software.anton.pcep.sources;
 
+import static software.anton.pcep.configs.Configuration.*;
+
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.source.RichSourceFunction;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
@@ -16,8 +18,6 @@ import static java.util.stream.Collectors.toCollection;
  * @author Anton Rudacov <anton.rudacov @ gmail.com>
  */
 public class OutgoingSource extends RichSourceFunction<String> {
-
-    private static final String DATASET = "src/main/resources/dataset/CalIt2.data";
 
     private long period;
     private boolean isRunning;
