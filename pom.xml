@@ -95,6 +95,12 @@ under the License.
 
     <!-- Additional dependencies -->
     <dependency>
+      <groupId>org.influxdb</groupId>
+      <artifactId>influxdb-java</artifactId>
+      <version>2.15</version>
+    </dependency>
+
+    <dependency>
       <groupId>com.konghq</groupId>
       <artifactId>unirest-java</artifactId>
       <version>2.3.14</version>
