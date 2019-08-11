@@ -1,5 +1,7 @@
 package software.anton.pcep.data;
 
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
 /**
  * @author Anton Rudacov <anton.rudacov @ gmail.com>
  */
@@ -42,5 +44,10 @@ public class Alert {
 
     public void setTag(String tag) {
         this.tag = tag;
+    }
+
+    @Override
+    public String toString() {
+        return ReflectionToStringBuilder.toString(this);
     }
 }

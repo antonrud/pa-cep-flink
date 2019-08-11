@@ -24,7 +24,7 @@ public class CepSelectFunction extends RichPatternSelectFunction<KeyedDataPoint<
     public AlertArea select(Map<String, List<KeyedDataPoint<Integer>>> pattern) throws Exception {
 
         long start = pattern.get("start").get(0).getTimeStamp();
-        long end = pattern.get("end").get(0).getTimeStamp();
+        long end = pattern.get("trigger").get(0).getTimeStamp();
 
         return new AlertArea(start, end, message, tag);
     }
