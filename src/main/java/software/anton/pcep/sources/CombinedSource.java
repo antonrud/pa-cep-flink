@@ -49,13 +49,17 @@ public class CombinedSource extends RichSourceFunction<String> {
 
             String[] partsIn = Objects.requireNonNull(linesIn.pollFirst()).split(",");
             String[] partsOut = Objects.requireNonNull(linesOut.pollFirst()).split(",");
+            int countIn = Integer.parseInt(partsIn[partsIn.length - 1]);
+            int countOut = Integer.parseInt(partsOut[partsOut.length - 1]);
 
             long timeStamp = System.currentTimeMillis();
-            String lineIn = "in," + partsIn[partsIn.length - 1] + "," + timeStamp;
-            String lineOut = "out," + partsOut[partsOut.length - 1] + "," + timeStamp;
+            String lineIn = "in," + countIn + "," + timeStamp;
+            String lineOut = "out," + countOut + "," + timeStamp;
+            String lineDiff = "diff," + (countIn - countOut) + "," + timeStamp;
 
             ctx.collectWithTimestamp(lineIn, timeStamp);
             ctx.collectWithTimestamp(lineOut, timeStamp);
+            ctx.collectWithTimestamp(lineDiff, timeStamp);
             ctx.emitWatermark(new Watermark(timeStamp));
         }
     }

@@ -7,6 +7,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import software.anton.pcep.data.KeyedDataPoint;
 import software.anton.pcep.functions.IncomingWindowFunction;
+import software.anton.pcep.functions.ModelTrainerFunction;
 import software.anton.pcep.maps.KeyedDataPointMap;
 import software.anton.pcep.sinks.InfluxDBSink;
 
@@ -37,11 +38,10 @@ public class ConsumerJob {
                 .apply(new IncomingWindowFunction())
                 .print();
 
-
-        
-
-
-
+        // Train model
+        dataStream.keyBy(KeyedDataPoint::getKey)
+                .countWindow(336)   //One week observation
+                .apply(new ModelTrainerFunction());
 
 
 //        GrafanaAnnotator annotator = new GrafanaAnnotator(GRAFANA_DASHBOARD, GRAFANA_PANEL);
