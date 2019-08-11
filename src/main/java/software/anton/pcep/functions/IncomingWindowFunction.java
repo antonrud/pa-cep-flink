@@ -14,20 +14,30 @@ import static software.anton.pcep.configs.Configuration.GRAFANA_PANEL;
  */
 public class IncomingWindowFunction implements WindowFunction<KeyedDataPoint<Integer>, Integer, String, GlobalWindow> {
 
-    private final static GrafanaAnnotator ANNOTATOR = new GrafanaAnnotator(GRAFANA_DASHBOARD, GRAFANA_PANEL);
+    private final static GrafanaAnnotator ANNOTATOR_IN = new GrafanaAnnotator(GRAFANA_DASHBOARD, GRAFANA_PANEL);
+    private final static GrafanaAnnotator ANNOTATOR_BOTH = new GrafanaAnnotator(GRAFANA_DASHBOARD, 4);
 
     @Override
-    public void apply(String s, GlobalWindow window, Iterable<KeyedDataPoint<Integer>> input, Collector<Integer> out) throws Exception {
+    public void apply(String key, GlobalWindow window, Iterable<KeyedDataPoint<Integer>> input, Collector<Integer> out) throws Exception {
 
         int sum = 0;
         long lastTimeStamp = 0L;
         for (KeyedDataPoint<Integer> point : input) {
+            System.out.println(point);
             sum += point.getValue();
             lastTimeStamp = point.getTimeStamp();
         }
 
-        if (sum > 25) {
-            ANNOTATOR.sendAnnotation(lastTimeStamp, "Alert", "IN");
+        switch (key) {
+            case "in":
+                if (sum > 25) {
+                    ANNOTATOR_IN.sendAnnotation(lastTimeStamp, "Alert", "IN");
+                }
+                break;
+            case "diff":
+                if (sum > 15) {
+                    ANNOTATOR_BOTH.sendAnnotation(lastTimeStamp, "Alert", "DIFF");
+                }
         }
 
         out.collect(sum);
