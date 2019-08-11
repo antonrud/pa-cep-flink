@@ -49,4 +49,23 @@ public final class GrafanaAnnotator {
     public int sendAnnotation(long start, long end, String text) {
         return sendAnnotation(start, end, text, "general");
     }
+
+    public int sendAnnotation(long start, String text, String tag) {
+
+        JSONObject body = new JSONObject();
+        body.put("dashboardId", dashboard);
+        body.put("panelId", panel);
+        body.put("time", start);
+        body.put("isRegion", false);
+        body.put("tags", Collections.singletonList(tag));
+        body.put("text", text);
+
+        return Unirest.post(URL)
+                .basicAuth(USER, PASS)
+                .header("Accept", "application/json")
+                .header("Content-Type", "application/json")
+                .body(body)
+                .asJson()
+                .getStatus();
+    }
 }
