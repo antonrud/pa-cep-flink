@@ -4,7 +4,6 @@ import static software.anton.pcep.configs.Configuration.*;
 
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.source.RichSourceFunction;
-import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.streaming.api.watermark.Watermark;
 
 import java.nio.file.Files;
@@ -17,13 +16,14 @@ import static java.util.stream.Collectors.toCollection;
 /**
  * @author Anton Rudacov <anton.rudacov @ gmail.com>
  */
-public class OutgoingSource extends RichSourceFunction<String> {
+public class CombinedSource extends RichSourceFunction<String> {
 
     private long rate;
     private boolean isRunning;
-    private LinkedList<String> lines;
+    private LinkedList<String> linesIn;
+    private LinkedList<String> linesOut;
 
-    public OutgoingSource(long rate) {
+    public CombinedSource(long rate) {
         this.rate = rate;
         this.isRunning = true;
     }
@@ -32,22 +32,30 @@ public class OutgoingSource extends RichSourceFunction<String> {
     public void open(Configuration parameters) throws Exception {
         super.open(parameters);
 
-        lines = Files.lines(Paths.get(DATASET))
+        linesIn = Files.lines(Paths.get(DATASET))
+                .filter(line -> line.charAt(0) == '9')
+                .collect(toCollection(LinkedList::new));
+
+        linesOut = Files.lines(Paths.get(DATASET))
                 .filter(line -> line.charAt(0) == '7')
                 .collect(toCollection(LinkedList::new));
     }
 
     @Override
-    public void run(SourceFunction.SourceContext<String> ctx) throws Exception {
+    public void run(SourceContext<String> ctx) throws Exception {
 
         while (isRunning) {
             Thread.sleep(rate);
 
-            String[] parts = Objects.requireNonNull(lines.pollFirst()).split(",");
-            long timeStamp = System.currentTimeMillis();
-            String line = "out," + parts[parts.length - 1] + "," + timeStamp;
+            String[] partsIn = Objects.requireNonNull(linesIn.pollFirst()).split(",");
+            String[] partsOut = Objects.requireNonNull(linesOut.pollFirst()).split(",");
 
-            ctx.collectWithTimestamp(line, timeStamp);
+            long timeStamp = System.currentTimeMillis();
+            String lineIn = "in," + partsIn[partsIn.length - 1] + "," + timeStamp;
+            String lineOut = "out," + partsOut[partsOut.length - 1] + "," + timeStamp;
+
+            ctx.collectWithTimestamp(lineIn, timeStamp);
+            ctx.collectWithTimestamp(lineOut, timeStamp);
             ctx.emitWatermark(new Watermark(timeStamp));
         }
     }

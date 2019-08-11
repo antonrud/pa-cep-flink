@@ -7,12 +7,12 @@ import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
-import software.anton.pcep.sources.OutgoingSource;
+import software.anton.pcep.sources.CombinedSource;
 
 /**
  * @author Anton Rudacov <anton.rudacov @ gmail.com>
  */
-public class OutgoingProducerJob {
+public class CombinedProducerJob {
 
     public static void main(String[] args) throws Exception {
 
@@ -20,11 +20,11 @@ public class OutgoingProducerJob {
         env.setParallelism(1);
         env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
-        DataStream<String> outgoingStream = env.addSource(new OutgoingSource(RATE));
+        DataStream<String> outgoingStream = env.addSource(new CombinedSource(RATE));
 
         outgoingStream.addSink(new FlinkKafkaProducer<>(KAFKA_BROKER, KAFKA_TOPIC, new SimpleStringSchema()));
         outgoingStream.print();
 
-        env.execute("Outgoing Producer");
+        env.execute("Combined Producer");
     }
 }
