@@ -93,6 +93,13 @@ under the License.
       <scope>runtime</scope>
     </dependency>
 
+    <!-- Prediction -->
+    <dependency>
+      <groupId>com.github.haifengl</groupId>
+      <artifactId>smile-core</artifactId>
+      <version>1.5.3</version>
+    </dependency>
+
     <!-- Additional dependencies -->
     <dependency>
       <groupId>org.apache.commons</groupId>

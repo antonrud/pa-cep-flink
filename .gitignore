@@ -1,6 +1,7 @@
 # Project specific
 **/datasets/
 **/resources/weka/
+listings
 
 # Compiled class file
 *.class
