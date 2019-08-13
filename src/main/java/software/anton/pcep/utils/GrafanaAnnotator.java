@@ -2,6 +2,7 @@ package software.anton.pcep.utils;
 
 import kong.unirest.Unirest;
 import org.json.JSONObject;
+import software.anton.pcep.data.Alert;
 
 import java.util.Collections;
 
@@ -67,5 +68,9 @@ public final class GrafanaAnnotator {
                 .body(body)
                 .asJson()
                 .getStatus();
+    }
+
+    public void sendAlert(Alert alert) {
+        sendAnnotation(alert.getTimestamp(), alert.getMessage(), alert.getTag());
     }
 }

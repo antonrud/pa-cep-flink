@@ -1,4 +1,4 @@
-package software.anton.pcep.prediction;
+package software.anton.pcep.testing;
 
 import smile.regression.RegressionTree;
 

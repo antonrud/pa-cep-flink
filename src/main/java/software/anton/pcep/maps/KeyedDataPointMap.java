@@ -9,15 +9,15 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 /**
  * @author Anton Rudacov <anton.rudacov @ gmail.com>
  */
-public class KeyedDataPointMap implements FlatMapFunction<String, KeyedDataPoint<Integer>> {
+public class KeyedDataPointMap implements FlatMapFunction<String, KeyedDataPoint<Double>> {
 
     @Override
-    public void flatMap(String value, Collector<KeyedDataPoint<Integer>> out) throws Exception {
+    public void flatMap(String value, Collector<KeyedDataPoint<Double>> out) throws Exception {
 
         if (isNotBlank(value)) {
 
             String[] parts = value.split(",");
-            out.collect(new KeyedDataPoint<>(parts[0], Integer.parseInt(parts[1].trim()), Long.parseLong(parts[2])));
+            out.collect(new KeyedDataPoint<>(parts[0], Double.valueOf(parts[1].trim()), Long.parseLong(parts[2])));
         }
     }
 }

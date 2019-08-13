@@ -12,7 +12,7 @@ import software.anton.pcep.sources.CombinedSource;
 /**
  * @author Anton Rudacov <anton.rudacov @ gmail.com>
  */
-public class CombinedProducerJob {
+public class ProducerJob {
 
     public static void main(String[] args) throws Exception {
 

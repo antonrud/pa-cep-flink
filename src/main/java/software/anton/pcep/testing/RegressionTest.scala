@@ -1,6 +1,4 @@
-package software.anton.pcep.prediction
-
-import smile.regression.RegressionTree
+package software.anton.pcep.testing
 
 /**
  * @author Anton Rudacov <anton.rudacov @ gmail.com>
