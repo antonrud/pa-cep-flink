@@ -5,9 +5,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class RMSECompare {
-
-  private static final int MAX_NODES = 100;
+public class RCompare {
 
   public static void main(String[] args) throws Exception {
 
@@ -37,16 +35,30 @@ public class RMSECompare {
             .map(Double::parseDouble)
             .collect(Collectors.toList());
 
-    double sum = 0;
-    for (int i = 0; i < actual30.size(); i++) {
-      sum += Math.pow(predicted30.get(i) - actual30.get(i), 2);
+    double mean30 = actual30.stream().mapToDouble(Double::doubleValue).sum() / actual30.size();
+    double sst = 0;
+    for (double x : actual30) {
+      sst += (Math.pow(x - mean30, 2));
     }
-    System.out.println(Math.sqrt(sum / actual30.size()));
 
-    sum = 0;
-    for (int i = 0; i < actual1.size(); i++) {
-      sum += Math.pow(predicted1.get(i) - actual1.get(i), 2);
+    double ssr = 0;
+    for (double y : predicted30) {
+      ssr += (Math.pow(y - mean30, 2));
     }
-    System.out.println(Math.sqrt(sum / actual1.size()));
+
+    System.out.println(ssr / sst);
+
+    double mean1 = actual1.stream().mapToDouble(Double::doubleValue).sum() / actual1.size();
+    sst = 0;
+    for (double x : actual1) {
+      sst += (Math.pow(x - mean30, 2));
+    }
+
+    ssr = 0;
+    for (double y : predicted1) {
+      ssr += (Math.pow(y - mean30, 2));
+    }
+    System.out.println(ssr / sst);
+
   }
 }
