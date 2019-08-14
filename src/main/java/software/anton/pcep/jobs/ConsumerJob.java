@@ -7,15 +7,12 @@ import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
+import software.anton.pcep.cep.PatternFactory;
 import software.anton.pcep.cep.PatternSelector;
 import software.anton.pcep.data.KeyedDataPoint;
 import software.anton.pcep.functions.AnnotationFunction;
-import software.anton.pcep.functions.IncomingWindowFunction;
-import software.anton.pcep.functions.ModelTrainerFunction;
 import software.anton.pcep.maps.KeyedDataPointMap;
 import software.anton.pcep.misc.SimpleAssigner;
-import software.anton.pcep.cep.PatternFactory;
-import software.anton.pcep.prediction.PredictedDataStreamMap;
 import software.anton.pcep.prediction.RegressionTreeModel;
 import software.anton.pcep.sinks.InfluxDBSink;
 
@@ -41,9 +38,6 @@ public class ConsumerJob {
         // Persist data in InfluxDB
         dataStream.addSink(new InfluxDBSink<>(INFLUX_DATABASE, INFLUX_MEASUREMENT));
 
-        // Sink to PA model (training)
-        dataStream.addSink(new RegressionTreeModel());
-
         // Load CEP pattern
         final Pattern<KeyedDataPoint<Double>, ?> pattern = PatternFactory.getPattern();
 
@@ -55,7 +49,8 @@ public class ConsumerJob {
         // Create stream of predicted values
         DataStream<KeyedDataPoint<Double>> predictedStream = dataStream
                 .filter(dataPoint -> dataPoint.getKey().equals("diff"))
-                .flatMap(new PredictedDataStreamMap());
+                .countWindowAll(8, 1)
+                .process(new RegressionTreeModel());
 
         // Persist prediction in InfluxDB
         predictedStream.addSink(new InfluxDBSink<>(INFLUX_DATABASE, INFLUX_PREDICTION_MEASUREMENT));
