@@ -11,6 +11,8 @@ import software.anton.pcep.cep.PatternFactory;
 import software.anton.pcep.cep.PatternSelector;
 import software.anton.pcep.data.KeyedDataPoint;
 import software.anton.pcep.functions.AnnotationFunction;
+import software.anton.pcep.functions.IncomingWindowFunction;
+import software.anton.pcep.functions.ModelTrainerFunction;
 import software.anton.pcep.maps.KeyedDataPointMap;
 import software.anton.pcep.misc.SimpleAssigner;
 import software.anton.pcep.prediction.RegressionTreeModel;
@@ -37,6 +39,7 @@ public class ConsumerJob {
 
         // Persist data in InfluxDB
         dataStream.addSink(new InfluxDBSink<>(INFLUX_DATABASE, INFLUX_MEASUREMENT));
+/*
 
         // Load CEP pattern
         final Pattern<KeyedDataPoint<Double>, ?> pattern = PatternFactory.getPattern();
@@ -60,19 +63,24 @@ public class ConsumerJob {
                 .select(new PatternSelector("predicted"))
                 .process(new AnnotationFunction());
 
-        env.execute("Data stream consumer");
-
-/*
+*/
         // Issue annotations
         dataStream.keyBy(KeyedDataPoint::getKey)
                 .countWindow(3, 1)
                 .apply(new IncomingWindowFunction())
                 .print();
 
+        env.execute("Data stream consumer");
+
+
+
+/*
+
         // Train model
         dataStream.keyBy(KeyedDataPoint::getKey)
                 .countWindow(336)   //One week observation
                 .apply(new ModelTrainerFunction());
 */
+
     }
 }
