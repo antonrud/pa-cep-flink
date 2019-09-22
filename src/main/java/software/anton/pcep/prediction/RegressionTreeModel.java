@@ -8,6 +8,7 @@ import org.apache.flink.util.Collector;
 import smile.regression.RegressionTree;
 import software.anton.pcep.data.KeyedDataPoint;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -29,20 +30,31 @@ public class RegressionTreeModel extends ProcessAllWindowFunction<KeyedDataPoint
   private List<Double> response30min;
   private List<Double> response1hour;
 
+  private int dataPointsCounter;
   private int weekCounter;
   private boolean modelIsReady;
 
   @Override
-
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
 
+    explanatoryVariables = new ArrayList<>();
+    response30min = new ArrayList<>();
+    response1hour = new ArrayList<>();
+
+    dataPointsCounter = 1;
     weekCounter = 0;
     modelIsReady = false;
   }
 
   @Override
   public void process(Context context, Iterable<KeyedDataPoint<Double>> elements, Collector<KeyedDataPoint<Double>> out) {
+
+    // Skip processing until 8 data points are received
+    if (dataPointsCounter < 8) {
+      dataPointsCounter++;
+      return;
+    }
 
     if (weekCounter < 336) {
       explanatoryVariables.add(calculateExplanatoryVariables(elements, 0));

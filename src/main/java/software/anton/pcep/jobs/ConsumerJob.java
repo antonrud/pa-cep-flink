@@ -1,18 +1,22 @@
 package software.anton.pcep.jobs;
 
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
+import org.apache.flink.api.common.typeinfo.TypeHint;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.cep.CEP;
 import org.apache.flink.cep.pattern.Pattern;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 import software.anton.pcep.cep.PatternFactory;
 import software.anton.pcep.cep.PatternSelector;
 import software.anton.pcep.data.KeyedDataPoint;
 import software.anton.pcep.functions.AnnotationFunction;
+import software.anton.pcep.functions.AnnotationFunctionPA;
+import software.anton.pcep.functions.DiffWindowFunction;
 import software.anton.pcep.functions.IncomingWindowFunction;
-import software.anton.pcep.functions.ModelTrainerFunction;
 import software.anton.pcep.maps.KeyedDataPointMap;
 import software.anton.pcep.misc.SimpleAssigner;
 import software.anton.pcep.prediction.RegressionTreeModel;
@@ -25,62 +29,67 @@ import static software.anton.pcep.configs.Configuration.*;
  */
 public class ConsumerJob {
 
-    public static void main(String[] args) throws Exception {
+  public static void main(String[] args) throws Exception {
 
-        final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        env.setParallelism(1);
-        env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
+    final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+    env.setParallelism(1);
+    env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
-        //Receive data from kafka topic
-        DataStream<KeyedDataPoint<Double>> dataStream = env
-                .addSource(new FlinkKafkaConsumer<>(KAFKA_TOPIC, new SimpleStringSchema(), KAFKA_PROPERTIES))
-                .flatMap(new KeyedDataPointMap())
-                .assignTimestampsAndWatermarks(new SimpleAssigner());
+    //Receive in and out data from kafka topic
+    DataStream<KeyedDataPoint<Double>> dataStreamInOut = env
+            .addSource(new FlinkKafkaConsumer<>(KAFKA_TOPIC_IN_OUT, new SimpleStringSchema(), KAFKA_PROPERTIES))
+            .flatMap(new KeyedDataPointMap())
+            .assignTimestampsAndWatermarks(new SimpleAssigner());
 
-        // Persist data in InfluxDB
-        dataStream.addSink(new InfluxDBSink<>(INFLUX_DATABASE, INFLUX_MEASUREMENT));
-/*
+    // Persist in and out data in InfluxDB
+    dataStreamInOut.addSink(new InfluxDBSink<>(INFLUX_DATABASE, INFLUX_MEASUREMENT));
 
-        // Load CEP pattern
-        final Pattern<KeyedDataPoint<Double>, ?> pattern = PatternFactory.getPattern();
+    //Receive diff data from kafka topic
+    DataStream<KeyedDataPoint<Double>> dataStreamDiff = env
+            .addSource(new FlinkKafkaConsumer<>(KAFKA_TOPIC_DIFF, new SimpleStringSchema(), KAFKA_PROPERTIES))
+            .flatMap(new KeyedDataPointMap())
+            .assignTimestampsAndWatermarks(new SimpleAssigner());
 
-        // Perform simple CEP
-        CEP.pattern(dataStream.filter(dataPoint -> dataPoint.getKey().equals("diff")), pattern)
-                .select(new PatternSelector("actual"))
-                .process(new AnnotationFunction());
+    // Persist diff data in InfluxDB
+    dataStreamDiff.addSink(new InfluxDBSink<>(INFLUX_DATABASE, INFLUX_MEASUREMENT));
 
-        // Create stream of predicted values
-        DataStream<KeyedDataPoint<Double>> predictedStream = dataStream
-                .filter(dataPoint -> dataPoint.getKey().equals("diff"))
-                .countWindowAll(8, 1)
-                .process(new RegressionTreeModel());
+    // Load CEP pattern
+    final Pattern<KeyedDataPoint<Double>, ?> pattern = PatternFactory.getPattern();
 
-        // Persist prediction in InfluxDB
-        predictedStream.addSink(new InfluxDBSink<>(INFLUX_DATABASE, INFLUX_PREDICTION_MEASUREMENT));
+    // Perform CEP on actual diffs
+    CEP.pattern(dataStreamDiff, pattern)
+            .select(new PatternSelector("actual"))
+            .process(new AnnotationFunction());
 
-        // Perform CEP on PA model
-        CEP.pattern(predictedStream, pattern)
-                .select(new PatternSelector("predicted"))
-                .process(new AnnotationFunction());
+    // Create stream of predicted values
+    DataStream<KeyedDataPoint<Double>> predictedStream = dataStreamDiff
+            .countWindowAll(8, 1)
+            .process(new RegressionTreeModel());
 
-*/
-        // Issue annotations
-        dataStream.keyBy(KeyedDataPoint::getKey)
-                .countWindow(3, 1)
-                .apply(new IncomingWindowFunction())
-                .print();
+    // Persist prediction in InfluxDB
+    predictedStream.addSink(new InfluxDBSink<>(INFLUX_DATABASE, INFLUX_PREDICTION_MEASUREMENT));
 
-        env.execute("Data stream consumer");
+    predictedStream
+            .map(KeyedDataPoint::marshal)
+            .addSink(new FlinkKafkaProducer<>(KAFKA_BROKER, KAFKA_TOPIC_PA, new SimpleStringSchema()));
 
+//    // Perform CEP on PA model
+//    CEP.pattern(predictedStream, pattern)
+//            .select(new PatternSelector("predicted"))
+//            .print();
 
+    env.execute("Data stream consumer");
 
-/*
+//        // Train model
+//        dataStream.keyBy(KeyedDataPoint::getKey)
+//                .countWindow(336)   //One week observation
+//                .apply(new ModelTrainerFunction());
 
-        // Train model
-        dataStream.keyBy(KeyedDataPoint::getKey)
-                .countWindow(336)   //One week observation
-                .apply(new ModelTrainerFunction());
-*/
+//        // Issue annotations (without CEP)
+//        dataStream.keyBy(KeyedDataPoint::getKey)
+//                .countWindow(3, 1)
+//                .apply(new IncomingWindowFunction());
+//                //.print();
 
-    }
+  }
 }

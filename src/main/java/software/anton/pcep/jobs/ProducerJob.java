@@ -14,17 +14,24 @@ import software.anton.pcep.sources.CombinedSource;
  */
 public class ProducerJob {
 
-    public static void main(String[] args) throws Exception {
+  public static void main(String[] args) throws Exception {
 
-        final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        env.setParallelism(1);
-        env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
+    final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+    env.setParallelism(1);
+    env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
-        DataStream<String> outgoingStream = env.addSource(new CombinedSource(RATE));
+    DataStream<String> outgoingStream = env.addSource(new CombinedSource(RATE));
 
-        outgoingStream.addSink(new FlinkKafkaProducer<>(KAFKA_BROKER, KAFKA_TOPIC, new SimpleStringSchema()));
-        outgoingStream.print();
+    outgoingStream
+            .filter(x -> x.charAt(0) != 'd')
+            .addSink(new FlinkKafkaProducer<>(KAFKA_BROKER, KAFKA_TOPIC_IN_OUT, new SimpleStringSchema()));
 
-        env.execute("Combined Producer");
-    }
+    outgoingStream
+            .filter(x -> x.charAt(0) == 'd')
+            .addSink(new FlinkKafkaProducer<>(KAFKA_BROKER, KAFKA_TOPIC_DIFF, new SimpleStringSchema()));
+
+    outgoingStream.print();
+
+    env.execute("Combined Producer");
+  }
 }

@@ -7,15 +7,16 @@ import software.anton.pcep.data.KeyedDataPoint;
 import software.anton.pcep.utils.GrafanaAnnotator;
 
 import static software.anton.pcep.configs.Configuration.GRAFANA_DASHBOARD;
-import static software.anton.pcep.configs.Configuration.GRAFANA_PANEL;
+import static software.anton.pcep.configs.Configuration.GRAFANA_PANEL_DIFF;
 
 /**
  * @author Anton Rudacov <anton.rudacov @ gmail.com>
  */
 public class IncomingWindowFunction implements WindowFunction<KeyedDataPoint<Double>, Double, String, GlobalWindow> {
 
-    private final static GrafanaAnnotator ANNOTATOR_IN = new GrafanaAnnotator(GRAFANA_DASHBOARD, GRAFANA_PANEL);
+    private final static GrafanaAnnotator ANNOTATOR_IN = new GrafanaAnnotator(GRAFANA_DASHBOARD, GRAFANA_PANEL_DIFF);
     private final static GrafanaAnnotator ANNOTATOR_BOTH = new GrafanaAnnotator(GRAFANA_DASHBOARD, 4);
+    private static int sumOfAlerts;
 
     @Override
     public void apply(String key, GlobalWindow window, Iterable<KeyedDataPoint<Double>> input, Collector<Double> out) throws Exception {
@@ -23,7 +24,7 @@ public class IncomingWindowFunction implements WindowFunction<KeyedDataPoint<Dou
         double sum = 0;
         long lastTimeStamp = 0L;
         for (KeyedDataPoint<Double> point : input) {
-            System.out.println(point);
+            //System.out.println(point);
             sum += point.getValue();
             lastTimeStamp = point.getTimeStamp();
         }
@@ -37,6 +38,7 @@ public class IncomingWindowFunction implements WindowFunction<KeyedDataPoint<Dou
             case "diff":
                 if (sum > 15) {
                     ANNOTATOR_BOTH.sendAnnotation(lastTimeStamp, "Alert", "DIFF");
+                    System.out.println(++sumOfAlerts);
                 }
         }
 

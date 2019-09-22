@@ -26,6 +26,11 @@ public class KeyedDataPoint<T> extends DataPoint<T> {
         this.key = key;
     }
 
+    public String marshal() {
+
+        return key + "," + getValue() + "," + getTimeStamp();
+    }
+
     @Override
     public String toString() {
         return ReflectionToStringBuilder.toString(this);

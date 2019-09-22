@@ -22,7 +22,7 @@ public class IncomingProducerJob {
 
         DataStream<String> incomingStream = env.addSource(new IncomingSource(RATE));
 
-        incomingStream.addSink(new FlinkKafkaProducer<>(KAFKA_BROKER, KAFKA_TOPIC, new SimpleStringSchema()));
+        incomingStream.addSink(new FlinkKafkaProducer<>(KAFKA_BROKER, KAFKA_TOPIC_IN_OUT, new SimpleStringSchema()));
         incomingStream.print();
 
         env.execute("Incoming Producer");

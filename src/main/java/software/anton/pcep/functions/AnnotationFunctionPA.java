@@ -6,13 +6,12 @@ import org.apache.flink.util.Collector;
 import software.anton.pcep.data.Alert;
 import software.anton.pcep.utils.GrafanaAnnotator;
 
-import static software.anton.pcep.configs.Configuration.GRAFANA_DASHBOARD;
-import static software.anton.pcep.configs.Configuration.GRAFANA_PANEL_DIFF;
+import static software.anton.pcep.configs.Configuration.*;
 
 /**
  * @author Anton Rudacov <anton.rudacov @ gmail.com>
  */
-public class AnnotationFunction extends ProcessFunction<Alert, Alert> {
+public class AnnotationFunctionPA extends ProcessFunction<Alert, Alert> {
 
   private GrafanaAnnotator annotator;
 
@@ -20,7 +19,7 @@ public class AnnotationFunction extends ProcessFunction<Alert, Alert> {
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
 
-    annotator = new GrafanaAnnotator(GRAFANA_DASHBOARD, GRAFANA_PANEL_DIFF);
+    annotator = new GrafanaAnnotator(GRAFANA_DASHBOARD, GRAFANA_PANEL_PA);
   }
 
   @Override

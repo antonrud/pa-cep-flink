@@ -13,6 +13,6 @@ public class TestApp {
 
         long start = System.currentTimeMillis();
 
-        System.out.println(new GrafanaAnnotator(GRAFANA_DASHBOARD, GRAFANA_PANEL).sendAnnotation(start, start + 1000L));
+        System.out.println(new GrafanaAnnotator(GRAFANA_DASHBOARD, GRAFANA_PANEL_DIFF).sendAnnotation(start, start + 1000L));
     }
 }

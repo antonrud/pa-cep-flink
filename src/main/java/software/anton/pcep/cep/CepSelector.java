@@ -1,4 +1,4 @@
-package software.anton.pcep.functions;
+package software.anton.pcep.cep;
 
 import org.apache.flink.cep.RichPatternSelectFunction;
 import software.anton.pcep.data.AlertArea;
@@ -10,12 +10,14 @@ import java.util.Map;
 /**
  * @author Anton Rudacov <anton.rudacov @ gmail.com>
  */
-public class CepSelectFunction extends RichPatternSelectFunction<KeyedDataPoint<Integer>, AlertArea> {
+
+// Not in use
+public class CepSelector extends RichPatternSelectFunction<KeyedDataPoint<Integer>, AlertArea> {
 
     private String message;
     private String tag;
 
-    public CepSelectFunction(String message, String tag) {
+    public CepSelector(String message, String tag) {
         this.message = message;
         this.tag = tag;
     }
