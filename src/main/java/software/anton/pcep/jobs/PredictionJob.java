@@ -13,9 +13,9 @@ import software.anton.pcep.data.KeyedDataPoint;
 import software.anton.pcep.functions.AnnotationFunctionPA;
 import software.anton.pcep.maps.KeyedDataPointMap;
 import software.anton.pcep.misc.SimpleAssigner;
+import software.anton.pcep.sinks.InfluxDBSink;
 
-import static software.anton.pcep.configs.Configuration.KAFKA_PROPERTIES;
-import static software.anton.pcep.configs.Configuration.KAFKA_TOPIC_PA;
+import static software.anton.pcep.configs.Configuration.*;
 
 /**
  * @author Anton Rudacov <anton.rudacov @ gmail.com>
@@ -29,18 +29,20 @@ public class PredictionJob {
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
     //Receive predicted data from kafka topic
-    DataStream<KeyedDataPoint<Double>> dataStreamPA = env
+    DataStream<KeyedDataPoint<Double>> predictedStream = env
             .addSource(new FlinkKafkaConsumer<>(KAFKA_TOPIC_PA, new SimpleStringSchema(), KAFKA_PROPERTIES))
             .flatMap(new KeyedDataPointMap())
             .assignTimestampsAndWatermarks(new SimpleAssigner());
+
+    // Persist prediction in InfluxDB
+    predictedStream.addSink(new InfluxDBSink<>(INFLUX_DATABASE, INFLUX_PREDICTION_MEASUREMENT));
 
     // Load CEP pattern
     final Pattern<KeyedDataPoint<Double>, ?> pattern = PatternFactory.getPattern();
 
     // Perform CEP on predicted diffs
-    CEP.pattern(dataStreamPA, pattern)
+    CEP.pattern(predictedStream, pattern)
             .select(new PatternSelector("predicted"))
-            //.print();
             .process(new AnnotationFunctionPA());
 
     env.execute("Prediction stream consumer");

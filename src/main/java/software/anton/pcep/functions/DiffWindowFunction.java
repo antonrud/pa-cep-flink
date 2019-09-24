@@ -11,6 +11,7 @@ import static software.anton.pcep.configs.Configuration.*;
 /**
  * @author Anton Rudacov <anton.rudacov @ gmail.com>
  */
+@Deprecated
 public class DiffWindowFunction implements WindowFunction<KeyedDataPoint<Double>, Double, String, GlobalWindow> {
 
   private final static GrafanaAnnotator ANNOTATOR = new GrafanaAnnotator(GRAFANA_DASHBOARD, GRAFANA_PANEL_PA);

@@ -11,7 +11,7 @@ import java.util.Map;
  * @author Anton Rudacov <anton.rudacov @ gmail.com>
  */
 
-// Not in use
+@Deprecated
 public class CepSelector extends RichPatternSelectFunction<KeyedDataPoint<Integer>, AlertArea> {
 
     private String message;

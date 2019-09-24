@@ -12,6 +12,7 @@ import static software.anton.pcep.configs.Configuration.GRAFANA_PANEL_DIFF;
 /**
  * @author Anton Rudacov <anton.rudacov @ gmail.com>
  */
+@Deprecated
 public class IncomingWindowFunction implements WindowFunction<KeyedDataPoint<Double>, Double, String, GlobalWindow> {
 
     private final static GrafanaAnnotator ANNOTATOR_IN = new GrafanaAnnotator(GRAFANA_DASHBOARD, GRAFANA_PANEL_DIFF);

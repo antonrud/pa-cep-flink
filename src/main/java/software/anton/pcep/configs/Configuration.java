@@ -8,7 +8,7 @@ import java.util.Properties;
 public final class Configuration {
 
   public static final String DATASET = "src/main/resources/dataset/CalIt2.data";
-  public static final long RATE = 20L;
+  public static final long RATE = 100L;
 
   public static final String ZOOKEEPER = "localhost:2181";
   public static final String KAFKA_BROKER = "localhost:9092";
@@ -24,6 +24,9 @@ public final class Configuration {
   public static final String INFLUX_MEASUREMENT = "data";
   public static final String INFLUX_PREDICTION_MEASUREMENT = "prediction";
 
+  public static final String GRAFANA_URL = "http://localhost:3000/api/annotations";
+  public static final String GRAFANA_USER = "admin";
+  public static final String GRAFANA_PASS = "password";
   public static final int GRAFANA_DASHBOARD = 5;
   public static final int GRAFANA_PANEL_IN_OUT = 2;
   public static final int GRAFANA_PANEL_DIFF = 4;

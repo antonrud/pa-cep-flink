@@ -157,9 +157,11 @@
     },
     {
       "aliasColors": {
+        "Actual": "super-light-blue",
         "DIFF": "yellow",
         "IN": "semi-dark-green",
-        "Prediction": "semi-dark-orange"
+        "Prediction": "semi-dark-orange",
+        "Prediction (1hour)": "semi-dark-red"
       },
       "bars": false,
       "dashLength": 10,
@@ -248,6 +250,32 @@
               "key": "key",
               "operator": "=",
               "value": "30min"
+            }
+          ]
+        },
+        {
+          "alias": "Prediction (1hour)",
+          "groupBy": [],
+          "measurement": "prediction",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "C",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "key",
+              "operator": "=",
+              "value": "1hour"
             }
           ]
         }
@@ -649,7 +677,7 @@
       }
     }
   ],
-  "refresh": false,
+  "refresh": "5s",
   "schemaVersion": 19,
   "style": "dark",
   "tags": [],
@@ -683,5 +711,5 @@
   "timezone": "",
   "title": "CalIt2 Dynamic",
   "uid": "2q_bd7iZz",
-  "version": 52
+  "version": 54
 }

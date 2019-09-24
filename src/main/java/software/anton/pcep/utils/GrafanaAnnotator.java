@@ -1,5 +1,9 @@
 package software.anton.pcep.utils;
 
+import static software.anton.pcep.configs.Configuration.GRAFANA_PASS;
+import static software.anton.pcep.configs.Configuration.GRAFANA_URL;
+import static software.anton.pcep.configs.Configuration.GRAFANA_USER;
+
 import kong.unirest.Unirest;
 import org.json.JSONObject;
 import software.anton.pcep.data.Alert;
@@ -10,10 +14,6 @@ import java.util.Collections;
  * @author Anton Rudacov <anton.rudacov @ gmail.com>
  */
 public final class GrafanaAnnotator {
-
-    private static final String URL = "http://localhost:3000/api/annotations";
-    private static final String USER = "admin";
-    private static final String PASS = "password";
 
     private final int dashboard;
     private final int panel;
@@ -34,8 +34,8 @@ public final class GrafanaAnnotator {
         body.put("tags", Collections.singletonList(tag));
         body.put("text", text);
 
-        return Unirest.post(URL)
-                .basicAuth(USER, PASS)
+        return Unirest.post(GRAFANA_URL)
+                .basicAuth(GRAFANA_USER, GRAFANA_PASS)
                 .header("Accept", "application/json")
                 .header("Content-Type", "application/json")
                 .body(body)
@@ -61,8 +61,8 @@ public final class GrafanaAnnotator {
         body.put("tags", Collections.singletonList(tag));
         body.put("text", text);
 
-        return Unirest.post(URL)
-                .basicAuth(USER, PASS)
+        return Unirest.post(GRAFANA_URL)
+                .basicAuth(GRAFANA_USER, GRAFANA_PASS)
                 .header("Accept", "application/json")
                 .header("Content-Type", "application/json")
                 .body(body)

@@ -1,8 +1,6 @@
 package software.anton.pcep.jobs;
 
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
-import org.apache.flink.api.common.typeinfo.TypeHint;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.cep.CEP;
 import org.apache.flink.cep.pattern.Pattern;
 import org.apache.flink.streaming.api.TimeCharacteristic;
@@ -14,9 +12,6 @@ import software.anton.pcep.cep.PatternFactory;
 import software.anton.pcep.cep.PatternSelector;
 import software.anton.pcep.data.KeyedDataPoint;
 import software.anton.pcep.functions.AnnotationFunction;
-import software.anton.pcep.functions.AnnotationFunctionPA;
-import software.anton.pcep.functions.DiffWindowFunction;
-import software.anton.pcep.functions.IncomingWindowFunction;
 import software.anton.pcep.maps.KeyedDataPointMap;
 import software.anton.pcep.misc.SimpleAssigner;
 import software.anton.pcep.prediction.RegressionTreeModel;
@@ -66,30 +61,11 @@ public class ConsumerJob {
             .countWindowAll(8, 1)
             .process(new RegressionTreeModel());
 
-    // Persist prediction in InfluxDB
-    predictedStream.addSink(new InfluxDBSink<>(INFLUX_DATABASE, INFLUX_PREDICTION_MEASUREMENT));
-
+    // Sink to prediction kafka topic
     predictedStream
             .map(KeyedDataPoint::marshal)
             .addSink(new FlinkKafkaProducer<>(KAFKA_BROKER, KAFKA_TOPIC_PA, new SimpleStringSchema()));
 
-//    // Perform CEP on PA model
-//    CEP.pattern(predictedStream, pattern)
-//            .select(new PatternSelector("predicted"))
-//            .print();
-
     env.execute("Data stream consumer");
-
-//        // Train model
-//        dataStream.keyBy(KeyedDataPoint::getKey)
-//                .countWindow(336)   //One week observation
-//                .apply(new ModelTrainerFunction());
-
-//        // Issue annotations (without CEP)
-//        dataStream.keyBy(KeyedDataPoint::getKey)
-//                .countWindow(3, 1)
-//                .apply(new IncomingWindowFunction());
-//                //.print();
-
   }
 }

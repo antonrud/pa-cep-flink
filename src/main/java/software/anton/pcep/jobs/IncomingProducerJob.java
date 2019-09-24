@@ -12,6 +12,7 @@ import software.anton.pcep.sources.IncomingSource;
 /**
  * @author Anton Rudacov <anton.rudacov @ gmail.com>
  */
+@Deprecated
 public class IncomingProducerJob {
 
     public static void main(String[] args) throws Exception {
