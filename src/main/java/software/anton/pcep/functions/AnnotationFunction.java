@@ -6,21 +6,25 @@ import org.apache.flink.util.Collector;
 import software.anton.pcep.data.Alert;
 import software.anton.pcep.utils.GrafanaAnnotator;
 
-import static software.anton.pcep.configs.Configuration.GRAFANA_DASHBOARD;
-import static software.anton.pcep.configs.Configuration.GRAFANA_PANEL_DIFF;
-
 /**
  * @author Anton Rudacov <anton.rudacov @ gmail.com>
  */
 public class AnnotationFunction extends ProcessFunction<Alert, Alert> {
 
+  private int dashboard;
+  private int panel;
   private GrafanaAnnotator annotator;
+
+  public AnnotationFunction(int dashboard, int panel) {
+    this.dashboard = dashboard;
+    this.panel = panel;
+  }
 
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
 
-    annotator = new GrafanaAnnotator(GRAFANA_DASHBOARD, GRAFANA_PANEL_DIFF);
+    annotator = new GrafanaAnnotator(dashboard, panel);
   }
 
   @Override

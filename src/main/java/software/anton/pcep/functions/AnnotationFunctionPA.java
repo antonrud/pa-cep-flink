@@ -11,6 +11,7 @@ import static software.anton.pcep.configs.Configuration.*;
 /**
  * @author Anton Rudacov <anton.rudacov @ gmail.com>
  */
+@Deprecated
 public class AnnotationFunctionPA extends ProcessFunction<Alert, Alert> {
 
   private GrafanaAnnotator annotator;

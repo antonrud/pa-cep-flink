@@ -54,7 +54,7 @@ public class ConsumerJob {
     // Perform CEP on actual diffs
     CEP.pattern(dataStreamDiff, pattern)
             .select(new PatternSelector("actual"))
-            .process(new AnnotationFunction());
+            .process(new AnnotationFunction(GRAFANA_DASHBOARD, GRAFANA_PANEL_DIFF));
 
     // Create stream of predicted values
     DataStream<KeyedDataPoint<Double>> predictedStream = dataStreamDiff

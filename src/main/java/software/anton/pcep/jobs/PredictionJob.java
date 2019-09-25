@@ -10,7 +10,7 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import software.anton.pcep.cep.PatternFactory;
 import software.anton.pcep.cep.PatternSelector;
 import software.anton.pcep.data.KeyedDataPoint;
-import software.anton.pcep.functions.AnnotationFunctionPA;
+import software.anton.pcep.functions.AnnotationFunction;
 import software.anton.pcep.maps.KeyedDataPointMap;
 import software.anton.pcep.misc.SimpleAssigner;
 import software.anton.pcep.sinks.InfluxDBSink;
@@ -43,7 +43,7 @@ public class PredictionJob {
     // Perform CEP on predicted diffs
     CEP.pattern(predictedStream, pattern)
             .select(new PatternSelector("predicted"))
-            .process(new AnnotationFunctionPA());
+            .process(new AnnotationFunction(GRAFANA_DASHBOARD, GRAFANA_PANEL_PA));
 
     env.execute("Prediction stream consumer");
   }
