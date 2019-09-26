@@ -20,7 +20,7 @@ import static software.anton.pcep.configs.Configuration.*;
 /**
  * @author Anton Rudacov <anton.rudacov @ gmail.com>
  */
-public class PredictionJob {
+public class PredictionAnnotationJob {
 
   public static void main(String[] args) throws Exception {
 
@@ -34,9 +34,6 @@ public class PredictionJob {
             .flatMap(new KeyedDataPointMap())
             .assignTimestampsAndWatermarks(new SimpleAssigner());
 
-    // Persist prediction in InfluxDB
-    predictedStream.addSink(new InfluxDBSink<>(INFLUX_DATABASE, INFLUX_PREDICTION_MEASUREMENT));
-
     // Load CEP pattern
     final Pattern<KeyedDataPoint<Double>, ?> pattern = PatternFactory.getPattern();
 
@@ -45,6 +42,6 @@ public class PredictionJob {
             .select(new PatternSelector("predicted"))
             .process(new AnnotationFunction(GRAFANA_DASHBOARD, GRAFANA_PANEL_PA));
 
-    env.execute("Prediction stream consumer");
+    env.execute("Prediction annotation job");
   }
 }

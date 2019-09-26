@@ -61,8 +61,12 @@ public class ConsumerJob {
             .countWindowAll(8, 1)
             .process(new RegressionTreeModel());
 
+    // Persist prediction in InfluxDB
+    predictedStream.addSink(new InfluxDBSink<>(INFLUX_DATABASE, INFLUX_PREDICTION_MEASUREMENT));
+
     // Sink to prediction kafka topic
     predictedStream
+            .filter(x -> x.getKey().equals("30min"))
             .map(KeyedDataPoint::marshal)
             .addSink(new FlinkKafkaProducer<>(KAFKA_BROKER, KAFKA_TOPIC_PA, new SimpleStringSchema()));
 
